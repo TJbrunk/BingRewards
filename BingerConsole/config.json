@@ -1,0 +1,22 @@
+{
+  "Accounts": [
+    {
+      "Email": "YOUR-Rewards@email.com",
+      "Password": "YOUR PASSWORD",
+      "DesktopSearches": {
+        "Enabled": false,
+        "MaxSearches": 10,
+        "MinSearches": 6,
+        "MaxDelay": 40,
+        "MinDelay": 5
+      },
+      "MobileSearches": {
+        "Enabled": true,
+        "MaxSearches": 10,
+        "MinSearches": 6,
+        "MaxDelay": 60,
+        "MinDelay": 5
+      }
+    }
+  ]
+}
