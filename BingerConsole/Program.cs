@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BingerConsole
@@ -28,6 +29,7 @@ namespace BingerConsole
             }
             set
             {
+                LastSearchTermUpdate = DateTime.Now;
                 _SearchTerms = value;
             }
         }
@@ -69,13 +71,11 @@ namespace BingerConsole
             }
             else
             {
-                List<Task> tasks = new List<Task>();
+                SearchTerms = GetNewSearches();
                 foreach (var a in accounts)
                 {
-                    tasks.Add(a.StartSearchesAsync());
-                    new RandomDelay().Delay("Loading next account", 30, 50);
+                    a.StartSearches();
                 }
-                Task.WaitAll(tasks.ToArray());
             }
         }
 
@@ -93,19 +93,14 @@ namespace BingerConsole
                     });
                 ReadOnlyCollection<IWebElement> headlines = driver.FindElements(By.ClassName("title"));
                 Console.WriteLine("Getting google headlines");
-                while (headlines.Count < 20)
+                while (headlines.Count < 50)
                 {
-                    Task.Delay(1500);
+                    Thread.Sleep(3000);
                     try
                     {
-                        var load = new WebDriverWait(driver, TimeSpan.FromSeconds(50));
-                        load.Until(d => {
-                            var btn = d.FindElement(By.ClassName("feed-load-more-button"));
-                            btn.Click();
-                            return true;
-                        });
+                        driver.FindElement(By.ClassName("feed-load-more-button")).Click();
                     }
-                    catch
+                    catch (NoSuchElementException)
                     {
                         headlines = driver.FindElements(By.ClassName("title"));
                         break;
