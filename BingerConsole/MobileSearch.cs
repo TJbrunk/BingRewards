@@ -45,28 +45,41 @@ namespace BingerConsole
         internal override void ExecuteSearch(List<string> phrase)
         {
             driver.Navigate().GoToUrl("http://www.bing.com/");
-
+            
             // Find the text input element by its name
             IWebElement query = driver.FindElement(By.Name("q"));
-            string search = string.Empty;
-            foreach (string word in phrase)
+
+            try
             {
-                query.Clear();
+                string search = string.Empty;
+                foreach (string word in phrase)
+                {
+                    query.Clear();
 
-                new RandomDelay().Delay(null, 5, 12);
+                    new RandomDelay().Delay(null, 5, 12);
 
-                search += $"{word} ";
-                // Enter something to search for
-                query.SendKeys(search);
+                    search += $"{word} ";
+                    // Enter something to search for
+                    query.SendKeys(search);
 
-                // Now submit the form.
-                query.Submit();
-                query = driver.FindElement(By.Name("q"));
+                    // Now submit the form.
+                    query.Submit();
+                    query = driver.FindElement(By.Name("q"));
+                }
+            
+                // Wait for the page to load, timeout after 20 seconds
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                wait.Until(d => d.Title.StartsWith(phrase[0], StringComparison.OrdinalIgnoreCase));
             }
-
-            // Wait for the page to load, timeout after 10 seconds
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-            wait.Until(d => d.Title.StartsWith(phrase[0], StringComparison.OrdinalIgnoreCase));
+            catch(UnhandledAlertException)
+            {
+                driver.SwitchTo().Alert().Dismiss();
+            }
+            catch (WebDriverTimeoutException)
+            {
+                // Try one more time to excute the search
+                query.Submit();
+            }
         }
 
         internal override void LoginToMicrosoft(string username, string password)
