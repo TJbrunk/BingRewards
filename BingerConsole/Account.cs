@@ -123,7 +123,8 @@ namespace BingerConsole
         public static List<Account> LoadAccounts()
         {
             // deserialize JSON directly from a file
-            using (StreamReader file = File.OpenText(@"config.json"))
+            var config = File.Exists(@"config.local.json") ? File.OpenText(@"config.local.json") : File.OpenText(@"config.json");
+            using (StreamReader file = config)
             {
                 JsonSerializer serializer = new JsonSerializer();
                 var accounts = (AccountsList)serializer.Deserialize(file, typeof(AccountsList));

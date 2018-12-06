@@ -1,22 +1,36 @@
 {
   "Accounts": [
     {
-      "Email": "YOUR-Rewards@email.com",
-      "Password": "YOUR PASSWORD",
+      "Email": "YOUR-FIRST-EMAIL@DOMAIN.COM",
+      "Password": "YOUR MICROSOFT PASSWORD",
       "DesktopSearches": {
-        "Enabled": false,
-        "MaxSearches": 10,
-        "MinSearches": 6,
-        "MaxDelay": 40,
-        "MinDelay": 5
+        "Disabled": true, // Disables running desktop searches for account.Optional Default=false
+        "NumSearches": 20, // Number of phrases to search. Optional Default=15. Each phrase may have up to 10 queries, so NumSearches==1 may result in 10 Bing searches
+        "SearchDelay": 60, // Seconds to wait between searches (search phrases). Default=30
+        "ClickLinks": true // Controls if a link should be clicked after a search phrase is complete. Default=false
       },
       "MobileSearches": {
-        "Enabled": true,
-        "MaxSearches": 10,
-        "MinSearches": 6,
-        "MaxDelay": 60,
-        "MinDelay": 5
+        "Disabled": false, // Disables running mobile searches for account. Default=false
+        "NumSearches": 20, // See above
+        "SearchDelay": 60, // See above
+        "ClickLinks": true // See above
+      }
+    },
+
+    {
+      "Email": "YOUR-SECOND-EMAIL@DOMAIN.COM",
+      "Password": "YOUR MICROSOFT PASSWORD",
+      "DesktopSearches": {
+        "Disabled": false,
+        "NumSearches": 2,
+        "SearchDelay": 10
+      },
+      "MobileSearches": {
+        "Disabled": true,
+        "NumSearches": 10,
+        "ClickLinks": true
       }
     }
+    // Add additional accounts with their own settings as desired
   ]
 }
