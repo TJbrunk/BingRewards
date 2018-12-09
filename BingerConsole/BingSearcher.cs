@@ -60,15 +60,80 @@ namespace BingerConsole
 
         internal void GetDailyPoints()
         {
+            driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/");
             var points = FindDailyPoints();
             GetFreePoints(points);
             GetDailyPoll(points);
             GetDailyQuiz(points);
+            GetSpecialPromotionPoints();
+            GetRandomActivities();
+        }
+
+        private void GetRandomActivities()
+        {
+            // Get the whole group of other actvities
+            var container = driver.FindElements(By.ClassName("m-card-group"));
+
+
+            // get the cards in the container
+            var cards = container[2].FindElements(By.ClassName("c-card-content"));
+
+            foreach (var card in cards)
+            {
+                try
+                {
+                    // get the cards that haven't been redeemed
+                    var c = card.FindElement(By.ClassName("mee-icon-AddMedium"));
+                    // Find the link and click it
+                    var link = card.FindElement(By.TagName("a"));
+                    link.Click();
+
+                    // Return to the microsoft dashboard tab
+                    ReadOnlyCollection<string> tabs = driver.WindowHandles;
+                    driver.SwitchTo().Window(tabs[1]);
+                    driver.Close();
+                    driver.SwitchTo().Window(tabs[0]);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private void GetSpecialPromotionPoints()
+        {
+            try
+            {
+                Thread.Sleep(10);
+                // Usually won't have promotional points.
+                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+                //wait.Until(d => d.FindElement(By.ClassName("promotional-container")));
+                var promo = driver.FindElement(By.ClassName("promotional-container"));
+                var link = promo.FindElement(By.TagName("a"));
+                link.Click();
+
+                // Return to the microsoft dashboard tab
+                ReadOnlyCollection<string> tabs = driver.WindowHandles;
+                driver.SwitchTo().Window(tabs[1]);
+                driver.Close();
+                driver.SwitchTo().Window(tabs[0]);
+            }
+            catch (NoSuchElementException)
+            {
+                Console.WriteLine("No promotional points found");
+            }
+            catch (WebDriverTimeoutException)
+            {
+                Console.WriteLine("Timed-out looking for promotional points");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting getting special promotions points. {ex}");
+            }
         }
 
         private ReadOnlyCollection<IWebElement> FindDailyPoints()
         {
-            driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/");
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
             wait.Until(d => d.FindElements(By.ClassName("rewards-card-container")));
 
