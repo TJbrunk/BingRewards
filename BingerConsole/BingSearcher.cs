@@ -222,8 +222,8 @@ namespace BingerConsole
                     wait.Until(d => d.FindElements(By.ClassName("wk_paddingBtm")));
                     var answers = driver.FindElements(By.ClassName("wk_paddingBtm"));
 
-                    // TODO: Pick a random answer
-                    answers[2].Click();
+                    var answer = new Random().Next(0, answers.Count - 1);
+                    answers[answer].Click();
 
                     Thread.Sleep(10);
                     // Click the 'NEXT' button
