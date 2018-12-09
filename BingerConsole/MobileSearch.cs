@@ -126,16 +126,23 @@ namespace BingerConsole
 
         internal override (int total, int earned) GetPoints()
         {
-            string date = DateTime.Now.ToString("M/dd/yyyy");
-            driver.Navigate().GoToUrl($"https://bing.com/rewardsapp/bepflyoutpage?style=modular&date={date}");
-            string pc = driver.FindElement(By.ClassName("mobile")).Text;
+            try
+            {
+                string date = DateTime.Now.ToString("M/dd/yyyy");
+                driver.Navigate().GoToUrl($"https://bing.com/rewardsapp/bepflyoutpage?style=modular&date={date}");
+                string pc = driver.FindElement(By.ClassName("mobilesearch")).Text;
 
-            Regex regex = new Regex(@"(?<earned>\d{1,4})\/(?<total>\d{1,4})");
-            Match match = regex.Match(pc);
-            string earned = match.Groups["earned"].ToString();
-            string total = match.Groups["total"].ToString();
+                Regex regex = new Regex(@"(?<earned>\d{1,4})\/(?<total>\d{1,4})");
+                Match match = regex.Match(pc);
+                int earned = int.Parse(match.Groups["earned"].ToString());
+                int total = int.Parse(match.Groups["total"].ToString());
 
-            return (int.Parse(total), int.Parse(earned));
+                return (total, earned);
+            }
+            catch (Exception)
+            {
+                return (1, 0);
+            }
         }
     }
 }

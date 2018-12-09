@@ -60,9 +60,10 @@ namespace BingerConsole
                 List<BingSearcher> browsers = new List<BingSearcher>();
                 foreach (var a in accounts)
                 {
-                    var b = a.Login(true);
-                    browsers.Add(b);
-                    a.GetTotalPoints(b);
+                    //var a = accounts[2];
+                    var browser = a.Login(true);
+                    browsers.Add(browser);
+                    a.ExecuteDailyPoints(browser);
                 }
                 Console.WriteLine("Press any key to exit");
                 Console.ReadKey();

@@ -13,9 +13,10 @@ namespace BingerConsole
         public string Email { get; set; }
         public string Password { get; set; }
         public bool Disabled { get; set; } = false;
+        public bool GetDailyPoints { get; set; } = true;
 
-        public SearchConfig DesktopSearches { get; set; }
-        public SearchConfig MobileSearches { get; set; }
+        public SearchConfig DesktopSearches { get; set; } = new SearchConfig();
+        public SearchConfig MobileSearches { get; set; } = new SearchConfig();
 
         private delegate Task<BingSearcher> SearchDelegate();
 
@@ -38,6 +39,14 @@ namespace BingerConsole
             if (Disabled)
                 return;
 
+            if (GetDailyPoints)
+            {
+                BingSearcher s = new DesktopSearch();
+                s.LoginToMicrosoft(Email, Password);
+                s.GetDailyPoints();
+                s.Dispose();
+            }
+
             if (!DesktopSearches.Disabled)
             {
                 BingSearcher s = this.RunDesktopSearches();
@@ -53,6 +62,7 @@ namespace BingerConsole
             }
             Console.WriteLine($"{Email} - ALL SEARCHES COMPLETE");
         }
+
         public async Task StartSearchesAsync()
         {
             await Task.Run(() =>
@@ -85,9 +95,9 @@ namespace BingerConsole
             return browser as BingSearcher;
         }
 
-        internal void GetTotalPoints(BingSearcher b)
+        internal void ExecuteDailyPoints(BingSearcher b)
         {
-            b.PrintAllPoints(this.Email);
+            b.GetDailyPoints();
         }
 
         private Task<BingSearcher> RunMobileSearchesAsync()
