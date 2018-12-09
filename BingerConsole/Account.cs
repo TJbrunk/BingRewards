@@ -12,6 +12,8 @@ namespace BingerConsole
     {
         public string Email { get; set; }
         public string Password { get; set; }
+        public bool Disabled { get; set; } = false;
+
         public SearchConfig DesktopSearches { get; set; }
         public SearchConfig MobileSearches { get; set; }
 
@@ -19,9 +21,9 @@ namespace BingerConsole
 
         private List<SearchDelegate> searchTypes = new List<SearchDelegate>();
 
-        public BingSearcher Login()
+        public BingSearcher Login(bool desktop)
         {
-            MobileSearch search = new MobileSearch();
+            BingSearcher search = desktop ? new DesktopSearch() as BingSearcher : new MobileSearch() as BingSearcher;
             search.LoginToMicrosoft(Email, Password);
             return search;
         }
@@ -33,6 +35,9 @@ namespace BingerConsole
 
         public void StartSearches()
         {
+            if (Disabled)
+                return;
+
             if (!DesktopSearches.Disabled)
             {
                 BingSearcher s = this.RunDesktopSearches();
@@ -72,9 +77,17 @@ namespace BingerConsole
 
                 int low = MobileSearches.SearchDelay <= 5 ? 1 : MobileSearches.SearchDelay - 5;
                 new RandomDelay().Delay($"{Email} - Starting next search", low, MobileSearches.SearchDelay);
+                (int total, int earned) = browser.GetPoints();
+                if (total == earned)
+                    break;
             }
             Console.WriteLine($"{Email} - Mobile searches complete");
             return browser as BingSearcher;
+        }
+
+        internal void GetTotalPoints(BingSearcher b)
+        {
+            b.PrintAllPoints(this.Email);
         }
 
         private Task<BingSearcher> RunMobileSearchesAsync()
@@ -102,6 +115,9 @@ namespace BingerConsole
                 }
                 int low = DesktopSearches.SearchDelay <= 5 ? 1 : DesktopSearches.SearchDelay - 5;
                 new RandomDelay().Delay($"{Email} - Starting next search", low, DesktopSearches.SearchDelay + 5);
+                (int total, int earned) = browser.GetPoints();
+                if (total == earned)
+                    break;
             }
             Console.WriteLine($"{Email} - Desktop searches complete");
             return browser as BingSearcher;

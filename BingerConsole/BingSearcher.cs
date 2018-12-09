@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BingerConsole
@@ -18,6 +19,9 @@ namespace BingerConsole
 
         abstract internal void ExecuteSearch(List<string> phrase);
 
+        abstract internal void PrintAllPoints(string email);
+
+        abstract internal (int total, int earned) GetPoints();
         public void Dispose()
         {
             this.driver.Dispose();
@@ -48,7 +52,7 @@ namespace BingerConsole
             catch (Exception)
             {
 
-                Console.Write($"{email} - Failed to get current points");
+                Console.WriteLine($"{email} - Failed to get current points");
             }
         }
     }

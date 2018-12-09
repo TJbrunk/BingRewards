@@ -33,6 +33,7 @@ namespace BingerConsole
                 _SearchTerms = value;
             }
         }
+
         private static DateTime LastSearchTermUpdate { get; set; }
 
         static void Main(string[] args)
@@ -41,10 +42,11 @@ namespace BingerConsole
 
             if (args.Contains("login"))
             {
+                Console.WriteLine("Logging into all accounts");
                 List<BingSearcher> browsers = new List<BingSearcher>();
                 foreach (var a in accounts)
                 {
-                    browsers.Add(a.Login());
+                    browsers.Add(a.Login(true));
                 }
                 Console.WriteLine("Press any key to exit");
                 Console.ReadKey();
@@ -58,9 +60,9 @@ namespace BingerConsole
                 List<BingSearcher> browsers = new List<BingSearcher>();
                 foreach (var a in accounts)
                 {
-                    var b = a.Login();
+                    var b = a.Login(true);
                     browsers.Add(b);
-                    a.GetPoints(b);
+                    a.GetTotalPoints(b);
                 }
                 Console.WriteLine("Press any key to exit");
                 Console.ReadKey();

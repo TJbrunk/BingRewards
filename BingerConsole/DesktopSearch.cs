@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -114,5 +116,36 @@ namespace BingerConsole
             Console.WriteLine($"{username} - Login Complete");
         }
 
+        internal override void PrintAllPoints(string email)
+        {
+            driver.Navigate().GoToUrl("https://bing.com");
+            Thread.Sleep(4000);
+            string totalPoints = driver.FindElement(By.Id("id_rc")).Text;
+            Console.WriteLine($"{email} - Total Points: {totalPoints}");
+
+            //driver.FindElement(By.CssSelector("#id_rh")).Click();
+            string date = DateTime.Now.ToString("M/dd/yyyy");
+            driver.Navigate().GoToUrl($"https://bing.com/rewardsapp/bepflyoutpage?style=modular&date={date}");
+            string pc = driver.FindElement(By.ClassName("pcsearch")).Text;
+
+            string mobile = driver.FindElement(By.ClassName("mobilesearch")).Text;
+
+            string edge = driver.FindElement(By.ClassName("edgesearch")).Text;
+            Console.WriteLine($"PC: {pc}\t Mobile: {mobile}\t Edge: {edge}");
+        }
+
+        internal override (int total, int earned) GetPoints()
+        {
+            string date = DateTime.Now.ToString("M/dd/yyyy");
+            driver.Navigate().GoToUrl($"https://bing.com/rewardsapp/bepflyoutpage?style=modular&date={date}");
+            string pc = driver.FindElement(By.ClassName("pcsearch")).Text;
+
+            Regex regex = new Regex(@"(?<earned>\d{1,4})\/(?<total>\d{1,4})");
+            Match match = regex.Match(pc);
+            string earned = match.Groups["earned"].ToString();
+            string total = match.Groups["total"].ToString();
+
+            return (int.Parse(total), int.Parse(earned));
+        }
     }
 }
