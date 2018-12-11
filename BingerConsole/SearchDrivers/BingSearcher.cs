@@ -37,8 +37,8 @@ namespace BingerConsole
                 driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/pointsbreakdown");
 
                 Task.Delay(4000);
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
+                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+                //wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
 
                 var p = driver.FindElements(By.ClassName("pointsDetail"));
                 var fc = Console.ForegroundColor;
@@ -136,8 +136,8 @@ namespace BingerConsole
         {
             try
             {
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                wait.Until(d => d.FindElements(By.ClassName("rewards-card-container")));
+                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+                //wait.Until(d => d.FindElements(By.ClassName("rewards-card-container")));
 
                 //var points = driver.FindElements(By.ClassName("rewards-card-container"));
 
@@ -183,8 +183,6 @@ namespace BingerConsole
                 // Switch to the new tab
                 ReadOnlyCollection<string> tabs = driver.WindowHandles;
                 driver.SwitchTo().Window(tabs[1]);
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                wait.Until(d => d.FindElements(By.ClassName("bt_PollRadio")));
 
                 // Click on one of the options
                 driver.FindElement(By.ClassName("bt_PollRadio")).Click();
@@ -215,8 +213,6 @@ namespace BingerConsole
                 driver.SwitchTo().Window(tabs[1]);
 
                 // Figure out how many questions are in the quiz
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                wait.Until(d => d.FindElement(By.ClassName("FooterText0")));
                 string questions = driver.FindElement(By.ClassName("FooterText0")).Text;
                 Regex regex = new Regex(@"of (?<total>\d)");
                 Match match = regex.Match(questions);
@@ -226,8 +222,6 @@ namespace BingerConsole
                 for(int i = 0; i<total; i++)
                 {
                     // Pick an answer and select it
-                    wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                    wait.Until(d => d.FindElements(By.ClassName("wk_paddingBtm")));
                     var answers = driver.FindElements(By.ClassName("wk_paddingBtm"));
 
                     var answer = new Random().Next(0, answers.Count - 1);

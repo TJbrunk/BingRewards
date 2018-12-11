@@ -100,12 +100,14 @@ namespace BingerConsole
             using (IWebDriver driver = new FirefoxDriver())
             {
                 driver.Navigate().GoToUrl("https://trends.google.com/trends/trendingsearches/realtime?geo=US&category=all");
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(13));
-                wait.Until(d => {
-                    var btn = d.FindElement(By.ClassName("feed-load-more-button"));
-                    btn.Click();
-                    return true;
-                    });
+                Thread.Sleep(2000);
+                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(13));
+                //wait.Until(d => {
+                //    var btn = d.FindElement(By.ClassName("feed-load-more-button"));
+                //    btn.Click();
+                //    return true;
+                //    });
+                driver.FindElement(By.ClassName("feed-load-more-button")).Click();
                 ReadOnlyCollection<IWebElement> headlines = driver.FindElements(By.ClassName("title"));
                 Console.WriteLine("Getting google headlines");
                 while (headlines.Count < 50)
