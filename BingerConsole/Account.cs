@@ -29,17 +29,12 @@ namespace BingerConsole
             return search;
         }
 
-        public void GetPoints(BingSearcher browser)
-        {
-            browser.GetPointsBreakDown(this.Email);
-        }
-
         public void StartSearches()
         {
             if (Disabled)
                 return;
 
-            if (GetDailyPoints)
+            if (GetDailyPoints && !MobileSearches.Disabled && !DesktopSearches.Disabled)
             {
                 BingSearcher s = new DesktopSearch();
                 s.LoginToMicrosoft(Email, Password);
@@ -50,14 +45,18 @@ namespace BingerConsole
             if (!DesktopSearches.Disabled)
             {
                 BingSearcher s = this.RunDesktopSearches();
-                this.GetPoints(s);
+                s.GetPointsBreakDown(this.Email);
+                if (GetDailyPoints)
+                    s.GetDailyPoints();
                 s.Dispose();
             }
 
             if (!MobileSearches.Disabled)
             {
                 BingSearcher s = this.RunMobileSearches();
-                this.GetPoints(s);
+                s.GetPointsBreakDown(this.Email);
+                if (GetDailyPoints)
+                    s.GetDailyPoints();
                 s.Dispose();
             }
             Console.WriteLine($"{Email} - ALL SEARCHES COMPLETE");
@@ -163,7 +162,7 @@ namespace BingerConsole
     {
         public bool Disabled { get; set; } = false;
         public int NumSearches { get; set; } = 15;
-        public int SearchDelay { get; set; } = 30;
+        public int SearchDelay { get; set; } = 65;
         public bool ClickLinks { get; set; } = false;
     }
 }

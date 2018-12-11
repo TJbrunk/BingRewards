@@ -3,6 +3,8 @@
     {
       "Email": "YOUR-FIRST-EMAIL@DOMAIN.COM",
       "Password": "YOUR MICROSOFT PASSWORD",
+      "Disabled": false, // Disable all functionality for this account
+      "GetDailyPoints": false, // Disable checking for daily points
       "DesktopSearches": {
         "Disabled": true, // Disables running desktop searches for account.Optional Default=false
         "NumSearches": 20, // Number of phrases to search. Optional Default=15. Each phrase may have up to 10 queries, so NumSearches==1 may result in 10 Bing searches
