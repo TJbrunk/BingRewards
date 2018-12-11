@@ -32,7 +32,13 @@ namespace BingerConsole
         public void StartSearches()
         {
             if (Disabled)
+            {
+                var c = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"{Email} - Disabled in config file");
+                Console.ForegroundColor = c;
                 return;
+            }
 
             if (GetDailyPoints && !MobileSearches.Disabled && !DesktopSearches.Disabled)
             {
@@ -44,20 +50,38 @@ namespace BingerConsole
 
             if (!DesktopSearches.Disabled)
             {
-                BingSearcher s = this.RunDesktopSearches();
-                s.GetPointsBreakDown(this.Email);
+                Console.WriteLine($"{Email} - Starting Desktop searches");
+                BingSearcher s = new DesktopSearch();
+                s.LoginToMicrosoft(Email, Password);
+
                 if (GetDailyPoints)
                     s.GetDailyPoints();
+
+                this.RunSearches(s, DesktopSearches);
+
+                s.GetPointsBreakDown(this.Email);
+                
                 s.Dispose();
+                Console.WriteLine($"{Email} - Desktop searches complete");
             }
 
             if (!MobileSearches.Disabled)
             {
-                BingSearcher s = this.RunMobileSearches();
-                s.GetPointsBreakDown(this.Email);
+                Console.WriteLine($"{Email} - Starting mobile searches");
+
+                BingSearcher s = new MobileSearch();
+                s.LoginToMicrosoft(Email, Password);
+
                 if (GetDailyPoints)
                     s.GetDailyPoints();
+
+                this.RunSearches(s, MobileSearches);
+
+                s.GetPointsBreakDown(this.Email);
+
                 s.Dispose();
+
+                Console.WriteLine($"{Email} - Mobile searches complete");
             }
             Console.WriteLine($"{Email} - ALL SEARCHES COMPLETE");
         }
@@ -70,74 +94,35 @@ namespace BingerConsole
             });
         }
 
-        private BingSearcher RunMobileSearches()
+        private Task RunSearchesAsync(BingSearcher bing, SearchConfig config)
         {
-            Console.WriteLine($"{Email} - Starting mobile searches");
-            MobileSearch browser = new MobileSearch();
-            browser.LoginToMicrosoft(Email, Password);
-            for (int i = 0; i < MobileSearches.NumSearches; i++)
+            return Task.Run(() =>
+            {
+                RunSearches(bing, config);
+            });
+        }
+
+        private void RunSearches(BingSearcher browser, SearchConfig config)
+        {
+            for (int i = 0; i < config.NumSearches; i++)
             {
                 List<string> phrase = Program.GetOneSearch(Program.SearchTerms);
                 browser.ExecuteSearch(phrase);
-                if (MobileSearches.ClickLinks)
-                {
-                    browser.ClickLink();
-                }
 
-                int low = MobileSearches.SearchDelay <= 5 ? 1 : MobileSearches.SearchDelay - 5;
-                new RandomDelay().Delay($"{Email} - Starting next search", low, MobileSearches.SearchDelay);
+                if (config.ClickLinks)
+                    browser.ClickLink();
+
+                int low = config.SearchDelay <= 5 ? 1 : config.SearchDelay - 5;
+                new RandomDelay().Delay($"{Email} - Starting next search", low, config.SearchDelay + 5);
                 (int total, int earned) = browser.GetPoints();
                 if (total == earned)
                     break;
             }
-            Console.WriteLine($"{Email} - Mobile searches complete");
-            return browser as BingSearcher;
         }
 
         internal void ExecuteDailyPoints(BingSearcher b)
         {
             b.GetDailyPoints();
-        }
-
-        private Task<BingSearcher> RunMobileSearchesAsync()
-        {
-            return Task.Run(() =>
-            {
-                return RunMobileSearches();
-            });
-        }
-
-
-        private BingSearcher RunDesktopSearches()
-        {
-            Console.WriteLine($"{Email} - Starting Desktop searches");
-            var browser = new DesktopSearch();
-            browser.LoginToMicrosoft(Email, Password);
-            for (int i = 0; i < DesktopSearches.NumSearches; i++)
-            {
-                List<string> phrase = Program.GetOneSearch(Program.SearchTerms);
-
-                browser.ExecuteSearch(phrase);
-                if (DesktopSearches.ClickLinks)
-                {
-                    browser.ClickLink();
-                }
-                int low = DesktopSearches.SearchDelay <= 5 ? 1 : DesktopSearches.SearchDelay - 5;
-                new RandomDelay().Delay($"{Email} - Starting next search", low, DesktopSearches.SearchDelay + 5);
-                (int total, int earned) = browser.GetPoints();
-                if (total == earned)
-                    break;
-            }
-            Console.WriteLine($"{Email} - Desktop searches complete");
-            return browser as BingSearcher;
-        }
-
-        private Task<BingSearcher> RunDesktopSearchesAsync()
-        {
-            return Task.Run(() =>
-            {
-                return RunDesktopSearches();
-            });
         }
     }
 

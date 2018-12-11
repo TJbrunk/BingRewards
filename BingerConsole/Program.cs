@@ -72,6 +72,18 @@ namespace BingerConsole
                     b.Dispose();
                 }
             }
+
+            else if (args.Contains("async"))
+            {
+                SearchTerms = GetNewSearches();
+                List<Task> searchers = new List<Task>();
+                foreach (var a in accounts)
+                {
+                    var t = a.StartSearchesAsync();
+                    searchers.Add(t);
+                }
+                Task.WaitAll(searchers.ToArray());
+            }
             else
             {
                 SearchTerms = GetNewSearches();

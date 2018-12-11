@@ -24,6 +24,7 @@ namespace BingerConsole
         abstract internal void PrintAllPoints(string email);
 
         abstract internal (int total, int earned) GetPoints();
+
         public void Dispose()
         {
             this.driver.Dispose();
@@ -40,13 +41,8 @@ namespace BingerConsole
                 wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
 
                 var p = driver.FindElements(By.ClassName("pointsDetail"));
-                //var pc = driver.FindElement(By.CssSelector("#userPointsBreakdown > div > div:nth-child(2) > div:nth-child(2) > div > div.pointsDetail > mee-rewards-user-points-details > div > div > div > div > p.pointsDetail.c-subheading-3.ng-binding.x-hidden-focus")).Text;
-                //var edge = driver.FindElement(By.CssSelector("#userPointsBreakdown > div > div:nth-child(2) > div:nth-child(1) > div > div.pointsDetail > mee-rewards-user-points-details > div > div > div > div > p.pointsDetail.c-subheading-3.ng-binding.x-hidden-focus")).Text;
-                //var mobile = driver.FindElement(By.CssSelector("#userPointsBreakdown > div > div:nth-child(2) > div:nth-child(3) > div > div.pointsDetail > mee-rewards-user-points-details > div > div > div > div > p.pointsDetail.c-subheading-3.ng-binding.x-hidden-focus")).Text;
-                //var other = driver.FindElement(By.CssSelector("#userPointsBreakdown > div > div:nth-child(2) > div:nth-child(5) > div > div.pointsDetail > mee-rewards-user-points-details > div > div > div > div > p.pointsDetail.c-subheading-3.ng-binding.x-hidden-focus")).Text;
                 var fc = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Magenta;
-                //Console.WriteLine($"{email} - Edge Bonus: {edge}\tPC Points: {pc}\tMobile: {mobile}\tOther: {other}");
                 Console.WriteLine($"{email} - Edge Bonus: {p[1].Text}\tPC Points: {p[3].Text}\tMobile: {p[5].Text}\tOther: {p[9].Text}");
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.ForegroundColor = fc;
@@ -63,9 +59,13 @@ namespace BingerConsole
             driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/");
             var points = FindDailyPoints();
             GetFreePoints(points);
+            Thread.Sleep(2000);
             GetDailyPoll(points);
+            Thread.Sleep(2000);
             GetDailyQuiz(points);
+            Thread.Sleep(2000);
             GetSpecialPromotionPoints();
+            Thread.Sleep(2000);
             GetRandomActivities();
         }
 
@@ -134,14 +134,22 @@ namespace BingerConsole
 
         private ReadOnlyCollection<IWebElement> FindDailyPoints()
         {
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-            wait.Until(d => d.FindElements(By.ClassName("rewards-card-container")));
+            try
+            {
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+                wait.Until(d => d.FindElements(By.ClassName("rewards-card-container")));
 
-            //var points = driver.FindElements(By.ClassName("rewards-card-container"));
+                //var points = driver.FindElements(By.ClassName("rewards-card-container"));
 
-            var dailySet = driver.FindElement(By.ClassName("m-card-group"));
-            var actionLinks = dailySet.FindElements(By.ClassName("c-call-to-action"));
-            return actionLinks;
+                var dailySet = driver.FindElement(By.ClassName("m-card-group"));
+                ReadOnlyCollection<IWebElement>  actionLinks = dailySet.FindElements(By.ClassName("c-call-to-action"));
+                return actionLinks;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Failed to find daily points");
+                return new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
+            }
         }
 
         private void GetFreePoints(ReadOnlyCollection<IWebElement> actionLinks)
@@ -200,7 +208,7 @@ namespace BingerConsole
             {
                 actionLinks[1].Click();
                 // This opens a new tab
-                Thread.Sleep(10);
+                Thread.Sleep(100);
 
                 // Switch to the new tab
                 var tabs = driver.WindowHandles;
