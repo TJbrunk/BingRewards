@@ -13,7 +13,8 @@ namespace BingerConsole
         public string Email { get; set; }
         public string Password { get; set; }
         public bool Disabled { get; set; } = false;
-        public bool GetDailyPoints { get; set; } = true;
+        public bool GetDailyPoints { get; set; } = false;
+        public int SwitchDelay { get; set; } = 6000;
 
         public SearchConfig DesktopSearches { get; set; } = new SearchConfig();
         public SearchConfig MobileSearches { get; set; } = new SearchConfig();
@@ -146,7 +147,7 @@ namespace BingerConsole
     internal class SearchConfig
     {
         public bool Disabled { get; set; } = false;
-        public int NumSearches { get; set; } = 15;
+        public int NumSearches { get; set; } = 30;
         public int SearchDelay { get; set; } = 65;
         public bool ClickLinks { get; set; } = false;
     }
