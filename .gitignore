@@ -3,6 +3,8 @@
 # Local config file with sensitive information
 *config.local.json
 
+*.exe
+
 # User-specific files
 *.suo
 *.user
