@@ -30,7 +30,7 @@ namespace BingerConsole
             return search;
         }
 
-        public void StartSearches()
+        public BingSearcher StartSearches()
         {
             if (Disabled)
             {
@@ -38,21 +38,23 @@ namespace BingerConsole
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine($"{Email} - Disabled in config file");
                 Console.ForegroundColor = c;
-                return;
+                return null;
             }
+
+            BingSearcher s = null;
 
             if (GetDailyPoints && !MobileSearches.Disabled && !DesktopSearches.Disabled)
             {
-                BingSearcher s = new DesktopSearch();
+                s = new DesktopSearch();
                 s.LoginToMicrosoft(Email, Password);
                 s.GetDailyPoints();
-                s.Dispose();
+                return s;
             }
 
             if (!DesktopSearches.Disabled)
             {
                 Console.WriteLine($"{Email} - Starting Desktop searches");
-                BingSearcher s = new DesktopSearch();
+                s = new DesktopSearch();
                 s.LoginToMicrosoft(Email, Password);
 
                 if (GetDailyPoints)
@@ -62,36 +64,42 @@ namespace BingerConsole
 
                 s.GetPointsBreakDown(this.Email);
                 
-                s.Dispose();
                 Console.WriteLine($"{Email} - Desktop searches complete");
             }
 
             if (!MobileSearches.Disabled)
             {
+                // Dispose the Desktop browser if it was set
+                if (s != null)
+                    s.Dispose();
+
+                new RandomDelay().Delay("Delay switching to mobile", this.SwitchDelay, this.SwitchDelay + 10);
                 Console.WriteLine($"{Email} - Starting mobile searches");
 
-                BingSearcher s = new MobileSearch();
+                s = new MobileSearch();
                 s.LoginToMicrosoft(Email, Password);
 
-                if (GetDailyPoints)
+                // Only try and get points if we didn't do it in the desktop searcher
+                if (GetDailyPoints && DesktopSearches.Disabled)
                     s.GetDailyPoints();
 
                 this.RunSearches(s, MobileSearches);
 
                 s.GetPointsBreakDown(this.Email);
 
-                s.Dispose();
-
                 Console.WriteLine($"{Email} - Mobile searches complete");
             }
+
             Console.WriteLine($"{Email} - ALL SEARCHES COMPLETE");
+
+            return s;
         }
 
-        public async Task StartSearchesAsync()
+        public async Task<BingSearcher> StartSearchesAsync()
         {
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
-                this.StartSearches();
+                return this.StartSearches();
             });
         }
 

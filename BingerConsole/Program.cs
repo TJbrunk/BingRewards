@@ -76,21 +76,34 @@ namespace BingerConsole
             else if (args.Contains("async"))
             {
                 SearchTerms = GetNewSearches();
-                List<Task> searchers = new List<Task>();
-                foreach (var a in accounts)
-                {
-                    var t = a.StartSearchesAsync();
-                    searchers.Add(t);
-                }
+                List<Task<BingSearcher>> searchers = new List<Task<BingSearcher>>();
+
+                // Start all the searchers
+                accounts.ForEach(a => searchers.Add(a.StartSearchesAsync()));
+
+                // Wait for all searches to complete
                 Task.WaitAll(searchers.ToArray());
+
+                Console.WriteLine("All searches complete. Press any key to exit");
+                Console.Read();
+
+                // Clean up
+                searchers.ForEach(s => s.Result.Dispose());
             }
             else
             {
                 SearchTerms = GetNewSearches();
-                foreach (var a in accounts)
-                {
-                    a.StartSearches();
-                }
+
+                List<BingSearcher> searchers = new List<BingSearcher>();
+
+                // Run the searches sequentially for accounts
+                accounts.ForEach(a => searchers.Add(a.StartSearches()));
+
+                Console.WriteLine("All searches complete. Press any key to exit");
+                Console.Read();
+
+                // Clean up
+                searchers.ForEach(s => s.Dispose());
             }
         }
 
