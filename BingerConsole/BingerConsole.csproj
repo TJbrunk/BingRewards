@@ -50,6 +50,9 @@
   <PropertyGroup>
     <StartupObject>BingerConsole.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>images_zjN_icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="HtmlAgilityPack, Version=1.8.10.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.8.10\lib\Net45\HtmlAgilityPack.dll</HintPath>
@@ -90,6 +93,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="images_zjN_icon.ico" />
     <Content Include="SeleniumDrivers\chromedriver.exe" />
     <Content Include="SeleniumDrivers\geckodriver.exe" />
   </ItemGroup>
