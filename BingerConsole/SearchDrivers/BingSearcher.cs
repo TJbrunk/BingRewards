@@ -212,6 +212,10 @@ namespace BingerConsole
                 var tabs = driver.WindowHandles;
                 driver.SwitchTo().Window(tabs[1]);
 
+                // Click the 'Start Playing' button
+                driver.FindElement(By.Id("rqStartQuiz")).Click();
+                Thread.Sleep(1000);
+
                 // Figure out how many questions are in the quiz
                 string questions = driver.FindElement(By.ClassName("FooterText0")).Text;
                 Regex regex = new Regex(@"of (?<total>\d)");
@@ -227,7 +231,7 @@ namespace BingerConsole
                     var answer = new Random().Next(0, answers.Count - 1);
                     answers[answer].Click();
 
-                    Thread.Sleep(10);
+                    Thread.Sleep(3000);
                     // Click the 'NEXT' button
                     driver.FindElement(By.ClassName("wk_buttons")).Click();
                 }
