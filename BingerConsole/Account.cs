@@ -13,7 +13,8 @@ namespace BingerConsole
         public string Email { get; set; }
         public string Password { get; set; }
         public bool Disabled { get; set; } = false;
-        public bool GetDailyPoints { get; set; } = true;
+        public bool GetDailyPoints { get; set; } = false;
+        public int SwitchDelay { get; set; } = 6000;
 
         public SearchConfig DesktopSearches { get; set; } = new SearchConfig();
         public SearchConfig MobileSearches { get; set; } = new SearchConfig();
@@ -29,7 +30,7 @@ namespace BingerConsole
             return search;
         }
 
-        public void StartSearches()
+        public BingSearcher StartSearches()
         {
             if (Disabled)
             {
@@ -37,21 +38,23 @@ namespace BingerConsole
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine($"{Email} - Disabled in config file");
                 Console.ForegroundColor = c;
-                return;
+                return null;
             }
 
-            if (GetDailyPoints && MobileSearches.Disabled && DesktopSearches.Disabled)
+            BingSearcher s = null;
+
+            if (GetDailyPoints && !MobileSearches.Disabled && !DesktopSearches.Disabled)
             {
-                BingSearcher s = new DesktopSearch();
+                s = new DesktopSearch();
                 s.LoginToMicrosoft(Email, Password);
                 s.GetDailyPoints();
-                s.Dispose();
+                return s;
             }
 
             if (!DesktopSearches.Disabled)
             {
                 Console.WriteLine($"{Email} - Starting Desktop searches");
-                BingSearcher s = new DesktopSearch();
+                s = new DesktopSearch();
                 s.LoginToMicrosoft(Email, Password);
 
                 this.RunSearches(s, DesktopSearches);
@@ -60,37 +63,43 @@ namespace BingerConsole
                     s.GetDailyPoints();
 
                 s.GetPointsBreakDown(this.Email);
-                
-                s.Dispose();
+
                 Console.WriteLine($"{Email} - Desktop searches complete");
             }
 
             if (!MobileSearches.Disabled)
             {
+                // Dispose the Desktop browser if it was set
+                if (s != null)
+                    s.Dispose();
+
+                new RandomDelay().Delay("Delay switching to mobile", this.SwitchDelay, this.SwitchDelay + 10);
                 Console.WriteLine($"{Email} - Starting mobile searches");
 
-                BingSearcher s = new MobileSearch();
+                s = new MobileSearch();
                 s.LoginToMicrosoft(Email, Password);
 
                 this.RunSearches(s, MobileSearches);
 
-                if (GetDailyPoints)
+                // Only try and get points if we didn't do it in the desktop searcher
+                if (GetDailyPoints && DesktopSearches.Disabled)
                     s.GetDailyPoints();
 
                 s.GetPointsBreakDown(this.Email);
 
-                s.Dispose();
-
                 Console.WriteLine($"{Email} - Mobile searches complete");
             }
+
             Console.WriteLine($"{Email} - ALL SEARCHES COMPLETE");
+
+            return s;
         }
 
-        public async Task StartSearchesAsync()
+        public async Task<BingSearcher> StartSearchesAsync()
         {
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
-                this.StartSearches();
+                return this.StartSearches();
             });
         }
 
@@ -146,9 +155,8 @@ namespace BingerConsole
     internal class SearchConfig
     {
         public bool Disabled { get; set; } = false;
-        public int NumSearches { get; set; } = 15;
+        public int NumSearches { get; set; } = 30;
         public int SearchDelay { get; set; } = 65;
         public bool ClickLinks { get; set; } = false;
     }
 }
-
