@@ -40,7 +40,7 @@ namespace BingerConsole
                 return;
             }
 
-            if (GetDailyPoints && !MobileSearches.Disabled && !DesktopSearches.Disabled)
+            if (GetDailyPoints && MobileSearches.Disabled && DesktopSearches.Disabled)
             {
                 BingSearcher s = new DesktopSearch();
                 s.LoginToMicrosoft(Email, Password);
