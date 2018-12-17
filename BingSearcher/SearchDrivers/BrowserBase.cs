@@ -1,9 +1,12 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -14,6 +17,11 @@ namespace BingSearcher
     internal abstract class BrowserBase : IDisposable
     {
         internal IWebDriver Driver { get; set; }
+
+        protected void LoadBrowser(ChromeOptions options)
+        {
+            Driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options);
+        }
 
         abstract internal void LoginToMicrosoft(string username, string password);
 

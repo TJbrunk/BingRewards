@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -114,7 +115,7 @@ namespace BingSearcher
             }
             Console.WriteLine(d);
             // Use a unique browser instance incase Bing is tracking stuff
-            using (IWebDriver driver = new FirefoxDriver())
+            using (IWebDriver driver = new FirefoxDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
             {
                 driver.Navigate().GoToUrl("https://trends.google.com/trends/trendingsearches/realtime?geo=US&category=all");
                 Thread.Sleep(2000);

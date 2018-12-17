@@ -22,7 +22,7 @@ namespace BingSearcher
         {
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240");
-            Driver = new ChromeDriver(options);
+            base.LoadBrowser(options);
         }
 
         internal override void ClickLink()
