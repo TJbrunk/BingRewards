@@ -23,6 +23,14 @@ namespace BingSearcher
 
         private List<SearchDelegate> searchTypes = new List<SearchDelegate>();
 
+        public Task<BrowserBase> LoginAsync(bool desktop)
+        {
+            return Task.Run<BrowserBase>(() =>
+            {
+                return this.Login(desktop);
+            });
+        }
+
         public BrowserBase Login(bool desktop)
         {
             BrowserBase search = desktop ? new DesktopBrowser() as BrowserBase : new MobileBrowser() as BrowserBase;

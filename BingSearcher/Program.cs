@@ -41,17 +41,15 @@ namespace BingSearcher
             if (args.Contains("login"))
             {
                 Console.WriteLine("Logging into all accounts");
-                List<BrowserBase> browsers = new List<BrowserBase>();
-                foreach (var a in accounts)
-                {
-                    browsers.Add(a.Login(true));
-                }
+                List<Task<BrowserBase>> browsers = new List<Task<BrowserBase>>();
+
+                accounts.ForEach(a => browsers.Add(a.LoginAsync(true)));
+
+                Task.WaitAll(browsers.ToArray());
                 Console.WriteLine("Press any key to exit");
                 Console.ReadKey();
-                foreach (var b in browsers)
-                {
-                    b.Dispose();
-                }
+
+                browsers.ForEach(b => b.Result.Dispose());
             }
             else if (args.Contains("points"))
             {

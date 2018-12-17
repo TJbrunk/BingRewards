@@ -113,6 +113,10 @@ namespace BingSearcher
             wait.Until(d => d.FindElement(By.Id("idSIButton9")));
             //Submit username and password
             Driver.FindElement(By.Id("idSIButton9")).Click();
+
+            // go to the rewards page as default
+            Driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/");
+
             Console.WriteLine($"{username} - Login Complete");
         }
 
