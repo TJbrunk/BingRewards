@@ -54,10 +54,10 @@ namespace BingerConsole
                 BingSearcher s = new DesktopSearch();
                 s.LoginToMicrosoft(Email, Password);
 
+                this.RunSearches(s, DesktopSearches);
+
                 if (GetDailyPoints)
                     s.GetDailyPoints();
-
-                this.RunSearches(s, DesktopSearches);
 
                 s.GetPointsBreakDown(this.Email);
                 
@@ -72,10 +72,10 @@ namespace BingerConsole
                 BingSearcher s = new MobileSearch();
                 s.LoginToMicrosoft(Email, Password);
 
+                this.RunSearches(s, MobileSearches);
+
                 if (GetDailyPoints)
                     s.GetDailyPoints();
-
-                this.RunSearches(s, MobileSearches);
 
                 s.GetPointsBreakDown(this.Email);
 
