@@ -73,6 +73,7 @@ namespace BingSearcher
                 s.GetPointsBreakDown(this.Email);
                 
                 Console.WriteLine($"{Email} - Desktop searches complete");
+                new RandomDelay().Delay("Delay switching to mobile", this.SwitchDelay, this.SwitchDelay + 10);
             }
 
             if (!MobileSearches.Disabled)
@@ -81,7 +82,6 @@ namespace BingSearcher
                 if (s != null)
                     s.Dispose();
 
-                new RandomDelay().Delay("Delay switching to mobile", this.SwitchDelay, this.SwitchDelay + 10);
                 Console.WriteLine($"{Email} - Starting mobile searches");
 
                 s = new MobileBrowser();
