@@ -69,7 +69,22 @@ namespace BingSearcher
                 }
             }
 
-            else if (args.Contains("async"))
+            else if (args.Contains("nonasync"))
+            {
+                SearchTerms = GetNewSearches();
+
+                List<BrowserBase> searchers = new List<BrowserBase>();
+
+                // Run the searches sequentially for accounts
+                accounts.ForEach(a => searchers.Add(a.StartSearches()));
+
+                Console.WriteLine("All searches complete. Press any key to exit");
+                Console.Read();
+
+                // Clean up
+                searchers.ForEach(s => s.Dispose());
+            }
+            else
             {
                 SearchTerms = GetNewSearches();
                 List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
@@ -85,21 +100,6 @@ namespace BingSearcher
 
                 // Clean up
                 searchers.ForEach(s => s.Result.Dispose());
-            }
-            else
-            {
-                SearchTerms = GetNewSearches();
-
-                List<BrowserBase> searchers = new List<BrowserBase>();
-
-                // Run the searches sequentially for accounts
-                accounts.ForEach(a => searchers.Add(a.StartSearches()));
-
-                Console.WriteLine("All searches complete. Press any key to exit");
-                Console.Read();
-
-                // Clean up
-                searchers.ForEach(s => s.Dispose());
             }
         }
 
