@@ -116,7 +116,7 @@ namespace BingSearcher
             using (IWebDriver driver = new FirefoxDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
             {
                 driver.Navigate().GoToUrl("https://trends.google.com/trends/trendingsearches/realtime?geo=US&category=all");
-                Thread.Sleep(2000);
+                Thread.Sleep(10000);
 
                 driver.FindElement(By.ClassName("feed-load-more-button")).Click();
                 ReadOnlyCollection<IWebElement> headlines = driver.FindElements(By.ClassName("title"));
@@ -124,7 +124,7 @@ namespace BingSearcher
                 Console.WriteLine("Getting google headlines");
                 while (headlines.Count < 50)
                 {
-                    Thread.Sleep(3000);
+                    Thread.Sleep(1500);
                     try
                     {
                         driver.FindElement(By.ClassName("feed-load-more-button")).Click();
