@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -128,8 +128,9 @@ namespace BingSearcher
         {
             try
             {
-                string date = DateTime.Now.ToString("M/dd/yyyy");
-                Driver.Navigate().GoToUrl($"https://bing.com/rewardsapp/bepflyoutpage?style=modular&date={date}");
+                // string date = DateTime.Now.ToString("M/dd/yyyy");
+                // Driver.Navigate().GoToUrl($"https://bing.com/rewardsapp/bepflyoutpage?style=modular&date={date}");
+                Driver.Navigate().GoToUrl($"https://account.microsoft.com/rewards/pointsbreakdown");
                 string pc = Driver.FindElement(By.ClassName("mobilesearch")).Text;
 
                 Regex regex = new Regex(@"(?<earned>\d{1,4})\/(?<total>\d{1,4})");

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -51,7 +51,7 @@ namespace BingSearcher
 
             BrowserBase s = null;
 
-            if (GetDailyPoints && !MobileSearches.Disabled && !DesktopSearches.Disabled)
+            if (GetDailyPoints && MobileSearches.Disabled && DesktopSearches.Disabled)
             {
                 s = new DesktopBrowser();
                 s.LoginToMicrosoft(Email, Password);
@@ -129,11 +129,13 @@ namespace BingSearcher
                 if (config.ClickLinks)
                     browser.ClickLink();
 
-                int low = config.SearchDelay <= 5 ? 1 : config.SearchDelay - 5;
-                new RandomDelay().Delay($"{Email} - Starting next search", low, config.SearchDelay + 5);
                 (int total, int earned) = browser.GetPoints();
+                Console.WriteLine($"{this.Email} - Earned {earned}/{total}");
                 if (total == earned)
                     break;
+
+                int low = config.SearchDelay <= 5 ? 1 : config.SearchDelay - 5;
+                new RandomDelay().Delay($"{Email} - Starting next search", low, config.SearchDelay + 5);
             }
         }
 

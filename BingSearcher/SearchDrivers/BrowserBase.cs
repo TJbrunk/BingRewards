@@ -168,6 +168,7 @@ namespace BingSearcher
                 // Switch to the new tab
                 var tabs = Driver.WindowHandles;
                 Driver.SwitchTo().Window(tabs[1]);
+                SignInToRewardsIfNeeded();
 
                 // Return to the microsoft dashboard tab
                 Driver.Close();
@@ -192,6 +193,8 @@ namespace BingSearcher
                 ReadOnlyCollection<string> tabs = Driver.WindowHandles;
                 Driver.SwitchTo().Window(tabs[1]);
 
+                this.SignInToRewardsIfNeeded();
+
                 // Click on one of the options
                 Driver.FindElement(By.ClassName("bt_PollRadio")).Click();
             }
@@ -208,6 +211,16 @@ namespace BingSearcher
             }
         }
 
+        private void SignInToRewardsIfNeeded()
+        {
+            if(Driver.Url.Contains("rewards/signin"))
+            {
+                var span = Driver.FindElement(By.ClassName("identityOption"));
+                var button = span.FindElement(By.TagName("a"));
+                button.Click();
+            }
+        }
+
         private void GetDailyQuiz(ReadOnlyCollection<IWebElement> actionLinks)
         {
             try
@@ -219,6 +232,7 @@ namespace BingSearcher
                 // Switch to the new tab
                 var tabs = Driver.WindowHandles;
                 Driver.SwitchTo().Window(tabs[1]);
+                SignInToRewardsIfNeeded();
 
                 // Figure out how many questions are in the quiz
                 string questions = Driver.FindElement(By.ClassName("FooterText0")).Text;

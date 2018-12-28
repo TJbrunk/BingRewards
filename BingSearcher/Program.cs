@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.CommandLineUtils;
+using Microsoft.Extensions.CommandLineUtils;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using System;
@@ -77,7 +77,6 @@ namespace BingSearcher
             search.Command("linear", config => {
                 config.Description = "Run searches on the configured accounts one account at a time";
                 config.OnExecute(() => {
-                    SearchTerms = GetNewSearches();
                     var accounts = AccountsList.LoadAccounts();
 
                     List<BrowserBase> searchers = new List<BrowserBase>();
@@ -107,7 +106,7 @@ namespace BingSearcher
 
                     Task.WaitAll(browsers.ToArray());
                     Console.WriteLine("Press any key to exit");
-                    Console.ReadKey();
+                    Console.Read();
 
                     browsers.ForEach(b => b.Result.Dispose());
                     return 0;
@@ -127,7 +126,7 @@ namespace BingSearcher
                         a.ExecuteDailyPoints(browser);
                     }
                     Console.WriteLine("Press any key to exit");
-                    Console.ReadKey();
+                    Console.Read();
                     foreach (var b in browsers)
                     {
                         b.Dispose();
