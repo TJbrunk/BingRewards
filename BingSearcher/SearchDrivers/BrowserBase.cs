@@ -197,6 +197,7 @@ namespace BingSearcher
 
                 // Click on one of the options
                 Driver.FindElement(By.ClassName("bt_PollRadio")).Click();
+                Thread.Sleep(1000);
             }
             catch(Exception ex)
             {
@@ -215,8 +216,9 @@ namespace BingSearcher
         {
             if(Driver.Url.Contains("rewards/signin"))
             {
-                var span = Driver.FindElement(By.ClassName("identityOption"));
-                var button = span.FindElement(By.TagName("a"));
+                var span = Driver.FindElement(By.ClassName("signInOptions"));
+                var button = span.FindElement(By.PartialLinkText("/fd/auth/signin?"));
+                // var button = span.FindElement(By.TagName("a"));
                 button.Click();
             }
         }
@@ -236,7 +238,7 @@ namespace BingSearcher
 
                 // Figure out how many questions are in the quiz
                 string questions = Driver.FindElement(By.ClassName("FooterText0")).Text;
-                Regex regex = new Regex(@"of (?<total>\d)");
+                Regex regex = new Regex(@"of (?<total>\d+)");
                 Match match = regex.Match(questions);
                 int total = int.Parse(match.Groups["total"].ToString());
 
@@ -249,7 +251,7 @@ namespace BingSearcher
                     var answer = new Random().Next(0, answers.Count - 1);
                     answers[answer].Click();
 
-                    Thread.Sleep(10);
+                    Thread.Sleep(700);
                     // Click the 'NEXT' button
                     Driver.FindElement(By.ClassName("wk_buttons")).Click();
                 }
