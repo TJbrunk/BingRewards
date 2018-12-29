@@ -1,4 +1,4 @@
-using Microsoft.Extensions.CommandLineUtils;
+﻿using Microsoft.Extensions.CommandLineUtils;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using System;
@@ -60,7 +60,12 @@ namespace BingSearcher
                     List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
 
                     // Start all the searchers
-                    accounts.ForEach(a => searchers.Add(a.StartSearchesAsync()));
+                    accounts.ForEach(a => 
+                        {
+                            searchers.Add(a.StartSearchesAsync());
+                            Thread.Sleep(3000);
+                        }
+                    );
 
                     // Wait for all searches to complete
                     Task.WaitAll(searchers.ToArray());
