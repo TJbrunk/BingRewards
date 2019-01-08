@@ -45,8 +45,8 @@ namespace BingSearcher
                 Driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/pointsbreakdown");
 
                 Task.Delay(4000);
-                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                //wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
+                var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+                wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
 
                 var p = Driver.FindElements(By.ClassName("pointsDetail"));
                 var fc = Console.ForegroundColor;
