@@ -58,15 +58,15 @@ namespace BingSearcher
 
                     List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
 
+                    SearchTerms = GetNewSearches();
+
                     // Start all the searchers
-                    accounts.ForEach(a => 
+                    accounts.ForEach(a =>
                         {
                             searchers.Add(a.StartSearchesAsync());
                             Thread.Sleep(5000);
                         }
                     );
-                    
-                    SearchTerms = GetNewSearches();
 
                     // Wait for all searches to complete
                     Task.WaitAll(searchers.ToArray());
@@ -141,7 +141,7 @@ namespace BingSearcher
                 });
             });
 
-            points.Command("help", config => { 
+            points.Command("help", config => {
                 config.Description = "get help!";
                 config.OnExecute(()=>{
                 login.ShowHelp("WIP: Attempts to get daily point (quizzes, polls, etc)");
