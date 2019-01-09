@@ -56,16 +56,17 @@ namespace BingSearcher
 
                     var accounts = AccountsList.LoadAccounts();
 
-                    SearchTerms = GetNewSearches();
                     List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
 
                     // Start all the searchers
                     accounts.ForEach(a => 
                         {
                             searchers.Add(a.StartSearchesAsync());
-                            Thread.Sleep(3000);
+                            Thread.Sleep(5000);
                         }
                     );
+                    
+                    SearchTerms = GetNewSearches();
 
                     // Wait for all searches to complete
                     Task.WaitAll(searchers.ToArray());
@@ -171,13 +172,13 @@ namespace BingSearcher
             using (IWebDriver driver = new FirefoxDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
             {
                 driver.Navigate().GoToUrl("https://trends.google.com/trends/trendingsearches/realtime?geo=US&category=all");
-                Thread.Sleep(10000);
+                Thread.Sleep(5000);
 
                 driver.FindElement(By.ClassName("feed-load-more-button")).Click();
                 ReadOnlyCollection<IWebElement> headlines = driver.FindElements(By.ClassName("title"));
 
                 Console.WriteLine("Getting google headlines");
-                while (headlines.Count < 50)
+                while (headlines.Count < 15)
                 {
                     Thread.Sleep(1500);
                     try
