@@ -63,7 +63,7 @@ namespace BingSearcher
             {
                 Console.WriteLine("Logging into accounts");
             }
-            if(Points) 
+            if(Points)
             {
                 Console.WriteLine("Getting Points");
             }
@@ -92,7 +92,7 @@ namespace BingSearcher
             //         List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
 
             //         // Start all the searchers
-            //         accounts.ForEach(a => 
+            //         accounts.ForEach(a =>
             //             {
             //                 searchers.Add(a.StartSearchesAsync());
             //                 Thread.Sleep(3000);
@@ -172,7 +172,7 @@ namespace BingSearcher
             //     });
             // });
 
-            // points.Command("help", config => { 
+            // points.Command("help", config => {
             //     config.Description = "get help!";
             //     config.OnExecute(()=>{
             //     login.ShowHelp("WIP: Attempts to get daily point (quizzes, polls, etc)");
@@ -194,13 +194,13 @@ namespace BingSearcher
             using (IWebDriver driver = new FirefoxDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
             {
                 driver.Navigate().GoToUrl("https://trends.google.com/trends/trendingsearches/realtime?geo=US&category=all");
-                Thread.Sleep(10000);
+                Thread.Sleep(5000);
 
                 driver.FindElement(By.ClassName("feed-load-more-button")).Click();
                 ReadOnlyCollection<IWebElement> headlines = driver.FindElements(By.ClassName("title"));
 
                 Console.WriteLine("Getting google headlines");
-                while (headlines.Count < 50)
+                while (headlines.Count < 15)
                 {
                     Thread.Sleep(1500);
                     try

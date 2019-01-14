@@ -128,17 +128,20 @@ namespace BingSearcher
         {
             try
             {
-                // string date = DateTime.Now.ToString("M/dd/yyyy");
-                // Driver.Navigate().GoToUrl($"https://bing.com/rewardsapp/bepflyoutpage?style=modular&date={date}");
                 Driver.Navigate().GoToUrl($"https://account.microsoft.com/rewards/pointsbreakdown");
-                string pc = Driver.FindElement(By.ClassName("mobilesearch")).Text;
 
-                Regex regex = new Regex(@"(?<earned>\d{1,4})\/(?<total>\d{1,4})");
-                Match match = regex.Match(pc);
-                int earned = int.Parse(match.Groups["earned"].ToString());
-                int total = int.Parse(match.Groups["total"].ToString());
+                Task.Delay(4000);
+                var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+                wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
 
-                return (total, earned);
+                var p = Driver.FindElements(By.ClassName("pointsDetail"));
+                var text = p[5].Text;
+                Regex regex = new Regex(@"(?<earned>\d{1,4})\ / (?<total>\d{1,4})");
+                Match match = regex.Match(text);
+                string earned = match.Groups["earned"].ToString();
+                string total = match.Groups["total"].ToString();
+
+                return (int.Parse(total), int.Parse(earned));
             }
             catch (Exception)
             {
