@@ -53,12 +53,11 @@ namespace BingSearcher
         ShortName = "l")]
         public bool Linear { get; }
 
+        [Option(Description = "Keeps the browser windows open at the completion of searches to get daily points, redeem rewards, etc")]
+        public bool Retain { get; }
+
         private void OnExecute()
         {
-            if(Linear)
-            {
-                Console.WriteLine("Linear searches");
-            }
             if(Login)
             {
                 Console.WriteLine("Logging into accounts");
@@ -67,20 +66,20 @@ namespace BingSearcher
             {
                 Console.WriteLine("Getting Points");
             }
+
+            if(Linear)
+            {
+                Console.WriteLine("Linear searches");
+            }
+            else
+            {
+                Console.WriteLine("Default Async searches");
+            }
             if(Wait != 6000)
             {
                 Console.WriteLine($"Custom delay. {Wait}");
             }
         }
-            // var search = app.Command("search", config => {
-            //     config.Description = "Main Program - Run searches to get points";
-            //     config.HelpOption("-? | -h | --help");
-            //     config.OnExecute(()=> {
-            //        config.ShowHelp();
-            //        return 1; //return error since we didn't do anything
-            //     });
-            // });
-
             // search.Command("async", config => {
             //     config.Description = "Run searches for all the configured accounts at the same time.";
             //     config.OnExecute(() => {
