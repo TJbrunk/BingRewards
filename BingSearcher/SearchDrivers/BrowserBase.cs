@@ -237,7 +237,7 @@ namespace BingSearcher
                 SignInToRewardsIfNeeded();
 
                 // Click the 'Start Playing' button
-                driver.FindElement(By.Id("rqStartQuiz")).Click();
+                Driver.FindElement(By.Id("rqStartQuiz")).Click();
                 Thread.Sleep(1000);
 
                 // Figure out how many questions are in the quiz
