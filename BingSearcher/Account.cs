@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BingerConsole
+namespace BingSearcher
 {
     internal class Account
     {
@@ -19,18 +19,26 @@ namespace BingerConsole
         public SearchConfig DesktopSearches { get; set; } = new SearchConfig();
         public SearchConfig MobileSearches { get; set; } = new SearchConfig();
 
-        private delegate Task<BingSearcher> SearchDelegate();
+        private delegate Task<BrowserBase> SearchDelegate();
 
         private List<SearchDelegate> searchTypes = new List<SearchDelegate>();
 
-        public BingSearcher Login(bool desktop)
+        public Task<BrowserBase> LoginAsync(bool desktop)
         {
-            BingSearcher search = desktop ? new DesktopSearch() as BingSearcher : new MobileSearch() as BingSearcher;
+            return Task.Run<BrowserBase>(() =>
+            {
+                return this.Login(desktop);
+            });
+        }
+
+        public BrowserBase Login(bool desktop)
+        {
+            BrowserBase search = desktop ? new DesktopBrowser() as BrowserBase : new MobileBrowser() as BrowserBase;
             search.LoginToMicrosoft(Email, Password);
             return search;
         }
 
-        public BingSearcher StartSearches()
+        public BrowserBase StartSearches()
         {
             if (Disabled)
             {
@@ -41,11 +49,11 @@ namespace BingerConsole
                 return null;
             }
 
-            BingSearcher s = null;
+            BrowserBase s = null;
 
-            if (GetDailyPoints && !MobileSearches.Disabled && !DesktopSearches.Disabled)
+            if (GetDailyPoints && MobileSearches.Disabled && DesktopSearches.Disabled)
             {
-                s = new DesktopSearch();
+                s = new DesktopBrowser();
                 s.LoginToMicrosoft(Email, Password);
                 s.GetDailyPoints();
                 return s;
@@ -54,7 +62,7 @@ namespace BingerConsole
             if (!DesktopSearches.Disabled)
             {
                 Console.WriteLine($"{Email} - Starting Desktop searches");
-                s = new DesktopSearch();
+                s = new DesktopBrowser();
                 s.LoginToMicrosoft(Email, Password);
 
                 this.RunSearches(s, DesktopSearches);
@@ -65,6 +73,7 @@ namespace BingerConsole
                 s.GetPointsBreakDown(this.Email);
 
                 Console.WriteLine($"{Email} - Desktop searches complete");
+                new RandomDelay().Delay("Delay switching to mobile", this.SwitchDelay, this.SwitchDelay + 10);
             }
 
             if (!MobileSearches.Disabled)
@@ -73,10 +82,9 @@ namespace BingerConsole
                 if (s != null)
                     s.Dispose();
 
-                new RandomDelay().Delay("Delay switching to mobile", this.SwitchDelay, this.SwitchDelay + 10);
                 Console.WriteLine($"{Email} - Starting mobile searches");
 
-                s = new MobileSearch();
+                s = new MobileBrowser();
                 s.LoginToMicrosoft(Email, Password);
 
                 this.RunSearches(s, MobileSearches);
@@ -95,7 +103,7 @@ namespace BingerConsole
             return s;
         }
 
-        public async Task<BingSearcher> StartSearchesAsync()
+        public async Task<BrowserBase> StartSearchesAsync()
         {
             return await Task.Run(() =>
             {
@@ -103,7 +111,7 @@ namespace BingerConsole
             });
         }
 
-        private Task RunSearchesAsync(BingSearcher bing, SearchConfig config)
+        private Task RunSearchesAsync(BrowserBase bing, SearchConfig config)
         {
             return Task.Run(() =>
             {
@@ -111,7 +119,7 @@ namespace BingerConsole
             });
         }
 
-        private void RunSearches(BingSearcher browser, SearchConfig config)
+        private void RunSearches(BrowserBase browser, SearchConfig config)
         {
             for (int i = 0; i < config.NumSearches; i++)
             {
@@ -121,15 +129,17 @@ namespace BingerConsole
                 if (config.ClickLinks)
                     browser.ClickLink();
 
-                int low = config.SearchDelay <= 5 ? 1 : config.SearchDelay - 5;
-                new RandomDelay().Delay($"{Email} - Starting next search", low, config.SearchDelay + 5);
                 (int total, int earned) = browser.GetPoints();
+                Console.WriteLine($"{this.Email} - Earned {earned}/{total}");
                 if (total == earned)
                     break;
+
+                int low = config.SearchDelay <= 5 ? 1 : config.SearchDelay - 5;
+                new RandomDelay().Delay($"{Email} - Starting next search", low, config.SearchDelay + 5);
             }
         }
 
-        internal void ExecuteDailyPoints(BingSearcher b)
+        internal void ExecuteDailyPoints(BrowserBase b)
         {
             b.GetDailyPoints();
         }

@@ -1,19 +1,27 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BingerConsole
+namespace BingSearcher
 {
-    internal abstract class BingSearcher : IDisposable
+    internal abstract class BrowserBase : IDisposable
     {
-        internal IWebDriver driver { get; set; }
+        internal IWebDriver Driver { get; set; }
+
+        protected void LoadBrowser(ChromeOptions options)
+        {
+            Driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options);
+        }
 
         abstract internal void LoginToMicrosoft(string username, string password);
 
@@ -27,20 +35,20 @@ namespace BingerConsole
 
         public void Dispose()
         {
-            this.driver.Dispose();
+            this.Driver.Dispose();
         }
 
         internal void GetPointsBreakDown(string email)
         {
             try
             {
-                driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/pointsbreakdown");
+                Driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/pointsbreakdown");
 
                 Task.Delay(4000);
                 //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
                 //wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
 
-                var p = driver.FindElements(By.ClassName("pointsDetail"));
+                var p = Driver.FindElements(By.ClassName("pointsDetail"));
                 var fc = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine($"{email} - Edge Bonus: {p[1].Text}\tPC Points: {p[3].Text}\tMobile: {p[5].Text}\tOther: {p[9].Text}");
@@ -56,7 +64,7 @@ namespace BingerConsole
 
         internal void GetDailyPoints()
         {
-            driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/");
+            Driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/");
             var points = FindDailyPoints();
             GetFreePoints(points);
             Thread.Sleep(2000);
@@ -72,7 +80,7 @@ namespace BingerConsole
         private void GetRandomActivities()
         {
             // Get the whole group of other actvities
-            var container = driver.FindElements(By.ClassName("m-card-group"));
+            var container = Driver.FindElements(By.ClassName("m-card-group"));
 
 
             // get the cards in the container
@@ -89,10 +97,10 @@ namespace BingerConsole
                     link.Click();
 
                     // Return to the microsoft dashboard tab
-                    ReadOnlyCollection<string> tabs = driver.WindowHandles;
-                    driver.SwitchTo().Window(tabs[1]);
-                    driver.Close();
-                    driver.SwitchTo().Window(tabs[0]);
+                    ReadOnlyCollection<string> tabs = Driver.WindowHandles;
+                    Driver.SwitchTo().Window(tabs[1]);
+                    Driver.Close();
+                    Driver.SwitchTo().Window(tabs[0]);
                 }
                 catch
                 {
@@ -108,15 +116,15 @@ namespace BingerConsole
                 // Usually won't have promotional points.
                 //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
                 //wait.Until(d => d.FindElement(By.ClassName("promotional-container")));
-                var promo = driver.FindElement(By.ClassName("promotional-container"));
+                var promo = Driver.FindElement(By.ClassName("promotional-container"));
                 var link = promo.FindElement(By.TagName("a"));
                 link.Click();
 
                 // Return to the microsoft dashboard tab
-                ReadOnlyCollection<string> tabs = driver.WindowHandles;
-                driver.SwitchTo().Window(tabs[1]);
-                driver.Close();
-                driver.SwitchTo().Window(tabs[0]);
+                ReadOnlyCollection<string> tabs = Driver.WindowHandles;
+                Driver.SwitchTo().Window(tabs[1]);
+                Driver.Close();
+                Driver.SwitchTo().Window(tabs[0]);
             }
             catch (NoSuchElementException)
             {
@@ -141,7 +149,7 @@ namespace BingerConsole
 
                 //var points = driver.FindElements(By.ClassName("rewards-card-container"));
 
-                var dailySet = driver.FindElement(By.ClassName("m-card-group"));
+                var dailySet = Driver.FindElement(By.ClassName("m-card-group"));
                 ReadOnlyCollection<IWebElement>  actionLinks = dailySet.FindElements(By.ClassName("c-call-to-action"));
                 return actionLinks;
             }
@@ -158,13 +166,14 @@ namespace BingerConsole
             {
                 actionLinks[0].Click();
                 // Switch to the new tab
-                var tabs = driver.WindowHandles;
-                driver.SwitchTo().Window(tabs[1]);
+                var tabs = Driver.WindowHandles;
+                Driver.SwitchTo().Window(tabs[1]);
+                SignInToRewardsIfNeeded();
 
                 // Return to the microsoft dashboard tab
-                driver.Close();
-                tabs = driver.WindowHandles;
-                driver.SwitchTo().Window(tabs[0]);
+                Driver.Close();
+                tabs = Driver.WindowHandles;
+                Driver.SwitchTo().Window(tabs[0]);
             }
             catch (Exception ex)
             {
@@ -181,11 +190,14 @@ namespace BingerConsole
                 Thread.Sleep(10);
 
                 // Switch to the new tab
-                ReadOnlyCollection<string> tabs = driver.WindowHandles;
-                driver.SwitchTo().Window(tabs[1]);
+                ReadOnlyCollection<string> tabs = Driver.WindowHandles;
+                Driver.SwitchTo().Window(tabs[1]);
+
+                this.SignInToRewardsIfNeeded();
 
                 // Click on one of the options
-                driver.FindElement(By.ClassName("bt_PollRadio")).Click();
+                Driver.FindElement(By.ClassName("bt_PollRadio")).Click();
+                Thread.Sleep(1000);
             }
             catch(Exception ex)
             {
@@ -194,9 +206,20 @@ namespace BingerConsole
             finally
             {
                 // Return to the microsoft dashboard tab
-                driver.Close();
-                ReadOnlyCollection<string> tabs = driver.WindowHandles;
-                driver.SwitchTo().Window(tabs[0]);
+                Driver.Close();
+                ReadOnlyCollection<string> tabs = Driver.WindowHandles;
+                Driver.SwitchTo().Window(tabs[0]);
+            }
+        }
+
+        private void SignInToRewardsIfNeeded()
+        {
+            if(Driver.Url.Contains("rewards/signin"))
+            {
+                var span = Driver.FindElement(By.ClassName("signInOptions"));
+                var button = span.FindElement(By.PartialLinkText("/fd/auth/signin?"));
+                // var button = span.FindElement(By.TagName("a"));
+                button.Click();
             }
         }
 
@@ -209,16 +232,17 @@ namespace BingerConsole
                 Thread.Sleep(100);
 
                 // Switch to the new tab
-                var tabs = driver.WindowHandles;
-                driver.SwitchTo().Window(tabs[1]);
+                var tabs = Driver.WindowHandles;
+                Driver.SwitchTo().Window(tabs[1]);
+                SignInToRewardsIfNeeded();
 
                 // Click the 'Start Playing' button
                 driver.FindElement(By.Id("rqStartQuiz")).Click();
                 Thread.Sleep(1000);
 
                 // Figure out how many questions are in the quiz
-                string questions = driver.FindElement(By.ClassName("FooterText0")).Text;
-                Regex regex = new Regex(@"of (?<total>\d)");
+                string questions = Driver.FindElement(By.ClassName("FooterText0")).Text;
+                Regex regex = new Regex(@"of (?<total>\d+)");
                 Match match = regex.Match(questions);
                 int total = int.Parse(match.Groups["total"].ToString());
 
@@ -226,14 +250,14 @@ namespace BingerConsole
                 for(int i = 0; i<total; i++)
                 {
                     // Pick an answer and select it
-                    var answers = driver.FindElements(By.ClassName("wk_paddingBtm"));
+                    var answers = Driver.FindElements(By.ClassName("wk_paddingBtm"));
 
                     var answer = new Random().Next(0, answers.Count - 1);
                     answers[answer].Click();
 
-                    Thread.Sleep(3000);
+                    Thread.Sleep(700);
                     // Click the 'NEXT' button
-                    driver.FindElement(By.ClassName("wk_buttons")).Click();
+                    Driver.FindElement(By.ClassName("wk_buttons")).Click();
                 }
             }
             catch (Exception ex)
@@ -243,9 +267,9 @@ namespace BingerConsole
             finally
             {
                 // Return to the microsoft dashboard tab
-                driver.Close();
-                ReadOnlyCollection<string> tabs = driver.WindowHandles;
-                driver.SwitchTo().Window(tabs[0]);
+                Driver.Close();
+                ReadOnlyCollection<string> tabs = Driver.WindowHandles;
+                Driver.SwitchTo().Window(tabs[0]);
             }
         }
     }

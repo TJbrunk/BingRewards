@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/BingSearcher/BingSearcher.csproj"
+            ],
+            "problemMatcher": "$msCompile",
+        },
+        {
+            // .net core publish https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "options": {"cwd": "${workspaceFolder}/BingSearcher"},
+            "args": [
+                "publish",
+                "${workspaceFolder}/BingSearcher/BingSearcher.csproj", // Project to publish
+                // "--framework", "netcoreapp2.2", //https://docs.microsoft.com/en-us/dotnet/standard/frameworks
+                "--configuration", "Release", // Config to publish
+                // "--output", "${workspaceFolder}/BingSearcher/bin/publish", // Output directory
+                "--runtime", "win10-x64", // Set the runtime to compile to. https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#rid-graph
+                "--verbosity", "normal", //https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish?tabs=netcore21#options
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
