@@ -195,8 +195,14 @@ namespace BingSearcher
 
                 this.SignInToRewardsIfNeeded();
 
+                // Give the page some time for the little popup to load with the options:
+                var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+                wait.Until(d => d.FindElement(By.ClassName("bt_PollRadio")));
+
                 // Click on one of the options
                 Driver.FindElement(By.ClassName("bt_PollRadio")).Click();
+
+                // Give microsoft some time to process our choice
                 Thread.Sleep(1000);
             }
             catch(Exception ex)
@@ -236,6 +242,10 @@ namespace BingSearcher
                 Driver.SwitchTo().Window(tabs[1]);
                 SignInToRewardsIfNeeded();
 
+                // Give some time for the popup with the button to load
+                var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+                wait.Until(d => d.FindElement(By.ClassName("rqStartQuiz")));
+
                 // Click the 'Start Playing' button
                 Driver.FindElement(By.Id("rqStartQuiz")).Click();
                 Thread.Sleep(1000);
@@ -255,7 +265,9 @@ namespace BingSearcher
                     var answer = new Random().Next(0, answers.Count - 1);
                     answers[answer].Click();
 
-                    Thread.Sleep(700);
+                    wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(5));
+                    wait.Until(d => d.FindElement(By.ClassName("wk_buttons")));
+                    // Thread.Sleep(1700);
                     // Click the 'NEXT' button
                     Driver.FindElement(By.ClassName("wk_buttons")).Click();
                 }
