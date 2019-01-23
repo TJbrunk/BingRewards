@@ -38,7 +38,7 @@ namespace BingSearcher
 
         public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);
 
-        [Option(Description = "Flag to try and get daily points")]
+        [Option(Description = "Flag to try and get daily points. Buggy, and doesn't work too well")]
         public bool Points { get; }
 
         [Option(Description = "Wait time in seconds to wait between switching from Desktop to mobile searches")]
@@ -53,132 +53,115 @@ namespace BingSearcher
         ShortName = "l")]
         public bool Linear { get; }
 
-        [Option(Description = "Keeps the browser windows open at the completion of searches to get daily points, redeem rewards, etc")]
-        public bool Retain { get; }
+        [Option(Description = "Keeps the browser windows open at the completion of searches to get daily points, redeem rewards, etc",
+        ShortName = "k")]
+        public bool KeepOpen { get; }
 
         private void OnExecute()
         {
             if(Login)
             {
-                Console.WriteLine("Logging into accounts");
+                LoginOnly();
             }
+
             if(Points)
             {
                 Console.WriteLine("Getting Points");
+                GetPoints();
             }
 
             if(Linear)
             {
                 Console.WriteLine("Linear searches");
+                SearchLinear();
             }
             else
             {
                 Console.WriteLine("Default Async searches");
-            }
-            if(Wait != 6000)
-            {
-                Console.WriteLine($"Custom delay. {Wait}");
+                SearchAsync();
             }
         }
-            // search.Command("async", config => {
-            //     config.Description = "Run searches for all the configured accounts at the same time.";
-            //     config.OnExecute(() => {
-            //         config.Description = "Run searches for all accounts at the same time";
 
-            //         var accounts = AccountsList.LoadAccounts();
+        private void SearchAsync()
+        {
+            var accounts = AccountsList.LoadAccounts();
 
-            //         SearchTerms = GetNewSearches();
-            //         List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
+            SearchTerms = GetNewSearches();
+            List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
 
-            //         // Start all the searchers
-            //         accounts.ForEach(a =>
-            //             {
-            //                 searchers.Add(a.StartSearchesAsync());
-            //                 Thread.Sleep(3000);
-            //             }
-            //         );
+            // Start all the searchers
+            accounts.ForEach(a =>
+                {
+                    searchers.Add(a.StartSearchesAsync());
+                    Thread.Sleep(3000);
+                }
+            );
 
-            //         // Wait for all searches to complete
-            //         Task.WaitAll(searchers.ToArray());
+            // Wait for all searches to complete
+            Task.WaitAll(searchers.ToArray());
 
-            //         Console.WriteLine("All searches complete. Press any key to exit");
-            //         Console.Read();
+            if(KeepOpen)
+            {
+                Console.WriteLine("All searches complete. Press any key to exit");
+                Console.Read();
+            }
+            // Clean up
+            searchers.ForEach(s => s.Result.Dispose());
+        }
 
-            //         // Clean up
-            //         searchers.ForEach(s => s.Result.Dispose());
-            //         return 1;
-            //     });
-            // });
+        private void SearchLinear()
+        {
+            var accounts = AccountsList.LoadAccounts();
 
-            // search.Command("linear", config => {
-            //     config.Description = "Run searches on the configured accounts one account at a time";
-            //     config.OnExecute(() => {
-            //         var accounts = AccountsList.LoadAccounts();
+            List<BrowserBase> searchers = new List<BrowserBase>();
 
-            //         List<BrowserBase> searchers = new List<BrowserBase>();
+            // Run the searches sequentially for accounts
+            accounts.ForEach(a => searchers.Add(a.StartSearches()));
 
-            //         // Run the searches sequentially for accounts
-            //         accounts.ForEach(a => searchers.Add(a.StartSearches()));
+            if(KeepOpen)
+            {
+                Console.WriteLine("All searches complete. Press any key to exit");
+                Console.Read();
+            }
 
-            //         Console.WriteLine("All searches complete. Press any key to exit");
-            //         Console.Read();
+            // Clean up
+            searchers.ForEach(s => s.Dispose());
+        }
 
-            //         // Clean up
-            //         searchers.ForEach(s => s.Dispose());
-            //         return 1;
-            //     });
-            // });
+        private void LoginOnly()
+        {
+            Console.WriteLine("Logging into all accounts");
+            var accounts = AccountsList.LoadAccounts();
 
-            // var login = app.Command("login", config => {
-            //     config.Description = "Opens a browser and logs into all accounts.\n\tUse to manually check points, get daily points, etc";
-            //     config.HelpOption("-? | -h | --help");
-            //     config.OnExecute(() => {
-            //         Console.WriteLine("Logging into all accounts");
-            //         var accounts = AccountsList.LoadAccounts();
+            List<Task<BrowserBase>> browsers = new List<Task<BrowserBase>>();
 
-            //         List<Task<BrowserBase>> browsers = new List<Task<BrowserBase>>();
+            accounts.ForEach(a => browsers.Add(a.LoginAsync(true)));
 
-            //         accounts.ForEach(a => browsers.Add(a.LoginAsync(true)));
+            Task.WaitAll(browsers.ToArray());
+            Console.WriteLine("Press any key to exit");
+            Console.Read();
 
-            //         Task.WaitAll(browsers.ToArray());
-            //         Console.WriteLine("Press any key to exit");
-            //         Console.Read();
+            browsers.ForEach(b => b.Result.Dispose());
+        }
 
-            //         browsers.ForEach(b => b.Result.Dispose());
-            //         return 0;
-            //     });
-            // });
+        private void GetPoints()
+        {
+            var accounts = AccountsList.LoadAccounts();
 
-            // var points = app.Command("points", config => {
-            //     config.Description = "Logs into each account and (trys) to get the daily points. Daily quiz, Daily poll, etc\n\tLogic not fully flushed out so it may not get all points";
-            //     config.OnExecute(() => {
-            //         var accounts = AccountsList.LoadAccounts();
-
-            //         List<BrowserBase> browsers = new List<BrowserBase>();
-            //         foreach (var a in accounts)
-            //         {
-            //             var browser = a.Login(true);
-            //             browsers.Add(browser);
-            //             a.ExecuteDailyPoints(browser);
-            //         }
-            //         Console.WriteLine("Press any key to exit");
-            //         Console.Read();
-            //         foreach (var b in browsers)
-            //         {
-            //             b.Dispose();
-            //         }
-            //         return 0;
-            //     });
-            // });
-
-            // points.Command("help", config => {
-            //     config.Description = "get help!";
-            //     config.OnExecute(()=>{
-            //     login.ShowHelp("WIP: Attempts to get daily point (quizzes, polls, etc)");
-            //         return 1;
-            //     });
-            // });
-        // }
+            List<BrowserBase> browsers = new List<BrowserBase>();
+            foreach (var a in accounts)
+            {
+                var browser = a.Login(true);
+                browsers.Add(browser);
+                a.ExecuteDailyPoints(browser);
+            }
+            Console.WriteLine("Press any key to exit");
+            Console.Read();
+            foreach (var b in browsers)
+            {
+                b.Dispose();
+            }
+        }
 
         private static List<string> GetNewSearches()
         {
