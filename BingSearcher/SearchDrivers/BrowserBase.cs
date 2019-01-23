@@ -29,8 +29,6 @@ namespace BingSearcher
 
         abstract internal void ExecuteSearch(List<string> phrase);
 
-        abstract internal void PrintAllPoints(string email);
-
         abstract internal (int total, int earned) GetPoints();
 
         public void Dispose()
