@@ -110,10 +110,7 @@ namespace BingSearcher
         {
             try
             {
-                Thread.Sleep(10);
-                // Usually won't have promotional points.
-                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                //wait.Until(d => d.FindElement(By.ClassName("promotional-container")));
+                Thread.Sleep(100);
                 var promo = Driver.FindElement(By.ClassName("promotional-container"));
                 var link = promo.FindElement(By.TagName("a"));
                 link.Click();
@@ -142,11 +139,6 @@ namespace BingSearcher
         {
             try
             {
-                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                //wait.Until(d => d.FindElements(By.ClassName("rewards-card-container")));
-
-                //var points = driver.FindElements(By.ClassName("rewards-card-container"));
-
                 var dailySet = Driver.FindElement(By.ClassName("m-card-group"));
                 ReadOnlyCollection<IWebElement>  actionLinks = dailySet.FindElements(By.ClassName("c-call-to-action"));
                 return actionLinks;
@@ -185,7 +177,7 @@ namespace BingSearcher
             {
                 // This opens a new tab
                 actionLinks[2].Click();
-                Thread.Sleep(10);
+                Thread.Sleep(2000);
 
                 // Switch to the new tab
                 ReadOnlyCollection<string> tabs = Driver.WindowHandles;
@@ -227,7 +219,7 @@ namespace BingSearcher
             {
                 actionLinks[1].Click();
                 // This opens a new tab
-                Thread.Sleep(100);
+                Thread.Sleep(2000);
 
                 // Switch to the new tab
                 var tabs = Driver.WindowHandles;

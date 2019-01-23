@@ -41,8 +41,8 @@ namespace BingSearcher
         [Option(Description = "Flag to try and get daily points. Buggy, and doesn't work too well")]
         public bool Points { get; }
 
-        [Option(Description = "Wait time in seconds to wait between switching from Desktop to mobile searches")]
-        public int Wait { get; } = 6000;
+        // [Option(Description = "Wait time in seconds to wait between switching from Desktop to mobile searches")]
+        // public int Wait { get; } = 6000;
 
         [Option( ShortName = "L",
             Description = "Opens browser for all accounts and logs in. Useful for checking points. DOES NOT PERFORM SEARCHES!"
@@ -56,6 +56,12 @@ namespace BingSearcher
         [Option(Description = "Keeps the browser windows open at the completion of searches to get daily points, redeem rewards, etc",
         ShortName = "k")]
         public bool KeepOpen { get; }
+
+        [Option(Description = "Only run with provided account index(s)", ShortName = "o")]
+        public string Only { get; }
+
+        [Option(Description = "Run searches eXcept for the provided account index(s)", ShortName = "x")]
+        public string Except { get; }
 
         private void OnExecute()
         {
@@ -82,9 +88,47 @@ namespace BingSearcher
             }
         }
 
-        private void SearchAsync()
+        private List<Account> LoadAccounts()
         {
             var accounts = AccountsList.LoadAccounts();
+            List<Account> filteredAccounts = new List<Account>();
+
+            if(!string.IsNullOrEmpty(Only))
+            {
+                string sep = Only.Contains(",") ? "," : " ";
+                string[] only = Only.Split(sep);
+                foreach (string index in only)
+                {
+                    int i = Int16.Parse(index) - 1;
+                    filteredAccounts.Add(accounts.ElementAt(i));
+                }
+
+                return filteredAccounts;
+            }
+            else if(!string.IsNullOrEmpty(Except))
+            {
+                string sep = Except.Contains(",") ? "," : " ";
+                List<string> except = Except.Split(sep).ToList();
+                List<int> indexes = new List<int>();
+                foreach (var item in except)
+                {
+                    indexes.Add(Int16.Parse(item) - 1);
+                }
+                indexes.OrderByDescending(i => i);
+                foreach (var i in indexes)
+                {
+                    accounts.RemoveAt(i);
+                }
+                return accounts;
+            }
+            else
+            {
+                return accounts;
+            }
+        }
+        private void SearchAsync()
+        {
+            var accounts = LoadAccounts();
 
             SearchTerms = GetNewSearches();
             List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
@@ -111,7 +155,7 @@ namespace BingSearcher
 
         private void SearchLinear()
         {
-            var accounts = AccountsList.LoadAccounts();
+            var accounts = LoadAccounts();
 
             List<BrowserBase> searchers = new List<BrowserBase>();
 
@@ -131,7 +175,7 @@ namespace BingSearcher
         private void LoginOnly()
         {
             Console.WriteLine("Logging into all accounts");
-            var accounts = AccountsList.LoadAccounts();
+            var accounts = LoadAccounts();
 
             List<Task<BrowserBase>> browsers = new List<Task<BrowserBase>>();
 
@@ -146,7 +190,7 @@ namespace BingSearcher
 
         private void GetPoints()
         {
-            var accounts = AccountsList.LoadAccounts();
+            var accounts = LoadAccounts();
 
             List<BrowserBase> browsers = new List<BrowserBase>();
             foreach (var a in accounts)

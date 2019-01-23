@@ -164,5 +164,4 @@ namespace BingSearcher
         }
     }
 
-    
 }
