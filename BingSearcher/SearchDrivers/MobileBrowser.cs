@@ -129,16 +129,15 @@ namespace BingSearcher
             try
             {
                 Driver.Navigate().GoToUrl($"https://account.microsoft.com/rewards/pointsbreakdown");
-                string mobile = Driver.FindElement(By.ClassName("mobilesearch")).Text;
 
                 Task.Delay(4000);
                 var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
                 wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
 
                 var p = Driver.FindElements(By.ClassName("pointsDetail"));
-
-                Regex regex = new Regex(@"(?<earned>\d{1,4})\/(?<total>\d{1,4})");
-                Match match = regex.Match(mobile);
+                var text = p[5].Text;
+                Regex regex = new Regex(@"(?<earned>\d{1,4})\ / (?<total>\d{1,4})");
+                Match match = regex.Match(text);
                 string earned = match.Groups["earned"].ToString();
                 string total = match.Groups["total"].ToString();
 

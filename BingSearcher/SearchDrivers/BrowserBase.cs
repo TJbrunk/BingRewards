@@ -236,6 +236,10 @@ namespace BingSearcher
                 Driver.SwitchTo().Window(tabs[1]);
                 SignInToRewardsIfNeeded();
 
+                // Click the 'Start Playing' button
+                Driver.FindElement(By.Id("rqStartQuiz")).Click();
+                Thread.Sleep(1000);
+
                 // Figure out how many questions are in the quiz
                 string questions = Driver.FindElement(By.ClassName("FooterText0")).Text;
                 Regex regex = new Regex(@"of (?<total>\d+)");

@@ -67,13 +67,13 @@ namespace BingSearcher
                 s = new DesktopBrowser();
                 s.LoginToMicrosoft(Email, Password);
 
+                this.RunSearches(s, DesktopSearches);
+
                 if (GetDailyPoints)
                     s.GetDailyPoints();
 
-                this.RunSearches(s, DesktopSearches);
-
                 s.GetPointsBreakDown(this.Email);
-                
+
                 Console.WriteLine($"{Email} - Desktop searches complete");
                 new RandomDelay().Delay("Delay switching to mobile", this.SwitchDelay, this.SwitchDelay + 10);
             }
@@ -89,11 +89,11 @@ namespace BingSearcher
                 s = new MobileBrowser();
                 s.LoginToMicrosoft(Email, Password);
 
+                this.RunSearches(s, MobileSearches);
+
                 // Only try and get points if we didn't do it in the desktop searcher
                 if (GetDailyPoints && DesktopSearches.Disabled)
                     s.GetDailyPoints();
-
-                this.RunSearches(s, MobileSearches);
 
                 s.GetPointsBreakDown(this.Email);
 
@@ -166,4 +166,3 @@ namespace BingSearcher
 
     
 }
-

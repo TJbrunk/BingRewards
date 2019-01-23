@@ -53,34 +53,33 @@ namespace BingSearcher
         ShortName = "l")]
         public bool Linear { get; }
 
+        [Option(Description = "Keeps the browser windows open at the completion of searches to get daily points, redeem rewards, etc")]
+        public bool Retain { get; }
+
         private void OnExecute()
         {
-            if(Linear)
-            {
-                Console.WriteLine("Linear searches");
-            }
             if(Login)
             {
                 Console.WriteLine("Logging into accounts");
             }
-            if(Points) 
+            if(Points)
             {
                 Console.WriteLine("Getting Points");
+            }
+
+            if(Linear)
+            {
+                Console.WriteLine("Linear searches");
+            }
+            else
+            {
+                Console.WriteLine("Default Async searches");
             }
             if(Wait != 6000)
             {
                 Console.WriteLine($"Custom delay. {Wait}");
             }
         }
-            // var search = app.Command("search", config => {
-            //     config.Description = "Main Program - Run searches to get points";
-            //     config.HelpOption("-? | -h | --help");
-            //     config.OnExecute(()=> {
-            //        config.ShowHelp();
-            //        return 1; //return error since we didn't do anything
-            //     });
-            // });
-
             // search.Command("async", config => {
             //     config.Description = "Run searches for all the configured accounts at the same time.";
             //     config.OnExecute(() => {
@@ -92,7 +91,7 @@ namespace BingSearcher
             //         List<Task<BrowserBase>> searchers = new List<Task<BrowserBase>>();
 
             //         // Start all the searchers
-            //         accounts.ForEach(a => 
+            //         accounts.ForEach(a =>
             //             {
             //                 searchers.Add(a.StartSearchesAsync());
             //                 Thread.Sleep(3000);
@@ -172,7 +171,7 @@ namespace BingSearcher
             //     });
             // });
 
-            // points.Command("help", config => { 
+            // points.Command("help", config => {
             //     config.Description = "get help!";
             //     config.OnExecute(()=>{
             //     login.ShowHelp("WIP: Attempts to get daily point (quizzes, polls, etc)");
@@ -194,13 +193,13 @@ namespace BingSearcher
             using (IWebDriver driver = new FirefoxDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
             {
                 driver.Navigate().GoToUrl("https://trends.google.com/trends/trendingsearches/realtime?geo=US&category=all");
-                Thread.Sleep(10000);
+                Thread.Sleep(5000);
 
                 driver.FindElement(By.ClassName("feed-load-more-button")).Click();
                 ReadOnlyCollection<IWebElement> headlines = driver.FindElements(By.ClassName("title"));
 
                 Console.WriteLine("Getting google headlines");
-                while (headlines.Count < 50)
+                while (headlines.Count < 15)
                 {
                     Thread.Sleep(1500);
                     try
