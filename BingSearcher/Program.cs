@@ -68,23 +68,27 @@ namespace BingSearcher
             if(Login)
             {
                 LoginOnly();
+                return;
             }
 
             if(Points)
             {
                 Console.WriteLine("Getting Points");
                 GetPoints();
+                return;
             }
 
             if(Linear)
             {
                 Console.WriteLine("Linear searches");
                 SearchLinear();
+                return;
             }
             else
             {
                 Console.WriteLine("Default Async searches");
                 SearchAsync();
+                return;
             }
         }
 
