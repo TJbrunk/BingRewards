@@ -112,18 +112,6 @@ namespace BingSearcher
             Driver.FindElement(By.Id("idSIButton9")).Click();
         }
 
-        internal override void PrintAllPoints(string email)
-        {
-            string date = DateTime.Now.ToString("M/dd/yyyy");
-            Driver.Navigate().GoToUrl($"https://bing.com/rewardsapp/bepflyoutpage?style=modular&date={date}");
-            string pc = Driver.FindElement(By.ClassName("pcsearch")).Text;
-
-            string mobile = Driver.FindElement(By.ClassName("mobilesearch")).Text;
-
-            string edge = Driver.FindElement(By.ClassName("edgesearch")).Text;
-            Console.WriteLine($"PC: {pc}\t Mobile: {mobile}\t Edge: {edge}");
-        }
-
         internal override (int total, int earned) GetPoints()
         {
             try

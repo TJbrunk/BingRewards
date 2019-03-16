@@ -29,8 +29,6 @@ namespace BingSearcher
 
         abstract internal void ExecuteSearch(List<string> phrase);
 
-        abstract internal void PrintAllPoints(string email);
-
         abstract internal (int total, int earned) GetPoints();
 
         public void Dispose()
@@ -45,8 +43,8 @@ namespace BingSearcher
                 Driver.Navigate().GoToUrl("https://account.microsoft.com/rewards/pointsbreakdown");
 
                 Task.Delay(4000);
-                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                //wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
+                var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+                wait.Until(d => d.FindElement(By.ClassName("ng-isolate-scope")));
 
                 var p = Driver.FindElements(By.ClassName("pointsDetail"));
                 var fc = Console.ForegroundColor;
@@ -112,10 +110,7 @@ namespace BingSearcher
         {
             try
             {
-                Thread.Sleep(10);
-                // Usually won't have promotional points.
-                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                //wait.Until(d => d.FindElement(By.ClassName("promotional-container")));
+                Thread.Sleep(100);
                 var promo = Driver.FindElement(By.ClassName("promotional-container"));
                 var link = promo.FindElement(By.TagName("a"));
                 link.Click();
@@ -144,11 +139,6 @@ namespace BingSearcher
         {
             try
             {
-                //var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                //wait.Until(d => d.FindElements(By.ClassName("rewards-card-container")));
-
-                //var points = driver.FindElements(By.ClassName("rewards-card-container"));
-
                 var dailySet = Driver.FindElement(By.ClassName("m-card-group"));
                 ReadOnlyCollection<IWebElement>  actionLinks = dailySet.FindElements(By.ClassName("c-call-to-action"));
                 return actionLinks;
@@ -187,7 +177,7 @@ namespace BingSearcher
             {
                 // This opens a new tab
                 actionLinks[2].Click();
-                Thread.Sleep(10);
+                Thread.Sleep(2000);
 
                 // Switch to the new tab
                 ReadOnlyCollection<string> tabs = Driver.WindowHandles;
@@ -235,7 +225,7 @@ namespace BingSearcher
             {
                 actionLinks[1].Click();
                 // This opens a new tab
-                Thread.Sleep(100);
+                Thread.Sleep(2000);
 
                 // Switch to the new tab
                 var tabs = Driver.WindowHandles;
