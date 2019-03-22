@@ -1,6 +1,6 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -221,7 +221,7 @@ namespace BingSearcher
             }
             Console.WriteLine(d);
             // Use a unique browser instance incase Bing is tracking stuff
-            using (IWebDriver driver = new FirefoxDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
+            using (IWebDriver driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)))
             {
                 driver.Navigate().GoToUrl("https://trends.google.com/trends/trendingsearches/realtime?geo=US&category=all");
                 Thread.Sleep(5000);
